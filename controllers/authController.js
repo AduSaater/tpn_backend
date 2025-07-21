@@ -71,9 +71,7 @@ exports.login = async (req, res) => {
     console.log("User found:", user);
 
     if (!user) {
-      return res
-        .status(401)
-        .json({ message: "Invalid credentials: User not found" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     if (user.user_type !== userType) {
@@ -81,18 +79,14 @@ exports.login = async (req, res) => {
         db: user.user_type,
         request: userType,
       });
-      return res
-        .status(401)
-        .json({ message: "Invalid credentials: User type mismatch" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     console.log("Password match:", isMatch);
 
     if (!isMatch) {
-      return res
-        .status(401)
-        .json({ message: "Invalid credentials: Incorrect password" });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
