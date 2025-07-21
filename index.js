@@ -58,16 +58,19 @@ app.get(
   authMiddleware(["frsc_admin", "enforcement"]),
   documentController.getAllUsers
 );
+
 app.get(
   "/api/admin/users/:userId",
   authMiddleware(["frsc_admin", "enforcement"]),
   documentController.getUserById
 );
+
 app.put(
   "/api/admin/users/:userId",
   authMiddleware(["frsc_admin", "enforcement"]),
   documentController.updateUser
 );
+
 app.delete(
   "/api/admin/users/:userId",
   authMiddleware(["frsc_admin", "enforcement"]),
