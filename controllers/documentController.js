@@ -4,7 +4,6 @@ const TPNApplication = require("../models/tpnApplication");
 const User = require("../models/user");
 const fs = require("fs");
 
-// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -204,10 +203,15 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const existingNin = await User.findByNin(nin);
+    if (existingNin && existingNin.id !== parseInt(userId)) {
+      return res.status(400).json({ message: "NIN already in use" });
+    }
+
     const updatedUser = await User.update(userId, {
       firstName,
       lastName,
-      email,
+      email: email.toLowerCase(),
       phone,
       nin,
       userType,

@@ -1,4 +1,3 @@
-// models/user.js
 const pool = require("../config/db");
 const bcrypt = require("bcrypt");
 
@@ -47,6 +46,14 @@ class User {
       SELECT * FROM users WHERE email = $1
     `;
     const { rows } = await pool.query(query, [email]);
+    return rows[0];
+  }
+
+  static async findByNin(nin) {
+    const query = `
+      SELECT * FROM users WHERE nin = $1
+    `;
+    const { rows } = await pool.query(query, [nin]);
     return rows[0];
   }
 

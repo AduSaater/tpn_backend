@@ -21,15 +21,22 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Invalid user type" });
     }
 
-    const existingUser = await User.findByEmail(email);
+    const existingUser = await User.findByEmail(email.toLowerCase());
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
+    }
+
+    const existingNin = await User.findByNin(nin);
+    if (existingNin) {
+      return res
+        .status(400)
+        .json({ message: "User with this NIN already exists" });
     }
 
     const newUser = await User.create({
       firstName,
       lastName,
-      email,
+      email: email.toLowerCase(),
       phone,
       nin,
       userType,
@@ -46,6 +53,11 @@ exports.register = async (req, res) => {
     res.status(201).json({ user: newUser, token });
   } catch (error) {
     console.error("Registration error:", error);
+    if (error.message.includes("users_nin_key")) {
+      return res
+        .status(400)
+        .json({ message: "User with this NIN already exists" });
+    }
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -53,19 +65,42 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password, userType } = req.body;
-    const user = await User.findByEmail(email);
-    if (!user || user.user_type !== userType) {
-      return res.status(401).json({ message: "Invalid credentials" });
+    console.log("Login attempt:", { email, userType });
+
+    const user = await User.findByEmail(email.toLowerCase());
+    console.log("User found:", user);
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: "Invalid credentials: User not found" });
     }
+
+    if (user.user_type !== userType) {
+      console.log("User type mismatch:", {
+        db: user.user_type,
+        request: userType,
+      });
+      return res
+        .status(401)
+        .json({ message: "Invalid credentials: User type mismatch" });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password match:", isMatch);
+
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res
+        .status(401)
+        .json({ message: "Invalid credentials: Incorrect password" });
     }
+
     const token = jwt.sign(
       { id: user.id, userType: user.user_type },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
     res.json({
       user: { id: user.id, email: user.email, userType: user.user_type },
       token,

@@ -2,14 +2,12 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-// Ensure uploads directory exists
 const uploadDir = "uploads/";
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
   fs.chmodSync(uploadDir, 0o755);
 }
 
-// Configure Multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
@@ -19,7 +17,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter to restrict uploads
 const fileFilter = (req, file, cb) => {
   const filetypes = /pdf|jpg|jpeg|png/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
