@@ -11,34 +11,9 @@ const authMiddleware = require("./middleware/authMiddleware");
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Enable CORS
-const corsOptions = {
-  origin: (origin, callback) => {
-    console.log("CORS origin check:", origin || "No origin (e.g., Postman)");
-    callback(null, true);
-  },
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-app.use(cors(corsOptions));
-
-// Log incoming requests
-app.use((req, res, next) => {
-  console.log(
-    `[${new Date().toISOString()}] ${req.method} ${req.url} - Body:`,
-    req.body
-  );
-  console.log("Headers:", req.headers);
-  res.on("finish", () => {
-    console.log(`Response status: ${res.statusCode}`);
-  });
-  next();
-});
-
 // Parse JSON bodies
 app.use(express.json());
-
+app.use(cors());
 // Routes
 app.post("/api/auth/register", authController.register);
 app.post("/api/auth/login", authController.login);

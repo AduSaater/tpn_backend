@@ -14,15 +14,18 @@ exports.register = async (req, res) => {
       address,
       password,
     } = req.body;
+
     if (
       !["individual", "dealer", "frsc_admin", "enforcement"].includes(userType)
     ) {
       return res.status(400).json({ message: "Invalid user type" });
     }
-    const user = await User.findByEmail(email);
-    if (user) {
+
+    const existingUser = await User.findByEmail(email);
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
+
     const newUser = await User.create({
       firstName,
       lastName,
@@ -33,11 +36,13 @@ exports.register = async (req, res) => {
       address,
       password,
     });
+
     const token = jwt.sign(
       { id: newUser.id, userType: newUser.user_type },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
+
     res.status(201).json({ user: newUser, token });
   } catch (error) {
     console.error("Registration error:", error);

@@ -1,4 +1,6 @@
+// models/user.js
 const pool = require("../config/db");
+const bcrypt = require("bcrypt");
 
 class User {
   static async create({
@@ -11,6 +13,7 @@ class User {
     address,
     password,
   }) {
+    const hashedPassword = await bcrypt.hash(password, 10);
     const query = `
       INSERT INTO users (first_name, last_name, email, phone, nin, user_type, address, password)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -24,7 +27,7 @@ class User {
       nin,
       userType,
       address,
-      password,
+      hashedPassword,
     ];
     const { rows } = await pool.query(query, values);
     return rows[0];
