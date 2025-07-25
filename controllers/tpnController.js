@@ -1,5 +1,5 @@
 const TPNApplication = require("../models/tpnApplication");
-
+const pool = require("../config/db");
 exports.createTPN = async (req, res) => {
   try {
     const { vin, engineNumber, make, model, year, color, bodyType } = req.body;
