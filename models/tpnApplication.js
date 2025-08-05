@@ -10,11 +10,12 @@ class TPNApplication {
     year,
     color,
     bodyType,
+    cNumber, // Added cNumber
   }) {
     const query = `
-      INSERT INTO tpn_applications (user_id, vin, engine_number, make, model, year, color, body_type, status)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pending')
-      RETURNING id, user_id, vin, engine_number, make, model, year, color, body_type, status
+      INSERT INTO tpn_applications (user_id, vin, engine_number, make, model, year, color, body_type, c_number, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'pending')
+      RETURNING id, user_id, vin, engine_number, make, model, year, color, body_type, c_number, status
     `;
     const values = [
       userId,
@@ -25,6 +26,7 @@ class TPNApplication {
       year,
       color,
       bodyType,
+      cNumber, // Added cNumber
     ];
     const { rows } = await pool.query(query, values);
     return rows[0];
@@ -32,7 +34,7 @@ class TPNApplication {
 
   static async findById(id) {
     const query = `
-      SELECT id, user_id, vin, engine_number, make, model, year, color, body_type, status
+      SELECT id, user_id, vin, engine_number, make, model, year, color, body_type, c_number, status
       FROM tpn_applications WHERE id = $1
     `;
     const { rows } = await pool.query(query, [id]);
@@ -41,7 +43,7 @@ class TPNApplication {
 
   static async findByUserId(userId) {
     const query = `
-      SELECT id, user_id, vin, engine_number, make, model, year, color, body_type, status
+      SELECT id, user_id, vin, engine_number, make, model, year, color, body_type, c_number, status
       FROM tpn_applications WHERE user_id = $1
     `;
     const { rows } = await pool.query(query, [userId]);

@@ -2,9 +2,9 @@ const TPNApplication = require("../models/tpnApplication");
 const pool = require("../config/db");
 exports.createTPN = async (req, res) => {
   try {
-    const { vin, engineNumber, make, model, year, color, bodyType } = req.body;
+    const { vin, engineNumber, make, model, year, color, bodyType, cNumber } =
+      req.body; // Added cNumber
     const userId = req.user.id;
-
     const application = await TPNApplication.create({
       userId,
       vin,
@@ -14,8 +14,8 @@ exports.createTPN = async (req, res) => {
       year,
       color,
       bodyType,
+      cNumber, // Added cNumber
     });
-
     res.status(201).json(application);
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
